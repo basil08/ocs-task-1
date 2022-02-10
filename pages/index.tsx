@@ -48,19 +48,17 @@ export default function Home() {
     // but it's client-side request
     fetch(`${GITHUB_REST_API_ENDPOINT}`, {
       method: 'POST',
-      headers: { "Content-Type": "application/json", "Authorization": "Bearer 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" },
+      headers: { "Content-Type": "application/json", "Authorization": "Bearer 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" },
       body: JSON.stringify({ "query": "query($org_name: String!, $repo_count: Int!, $forker_count: Int!) { organization(login: $org_name) { repositories(first: $repo_count) { edges { node { name forkCount forks(orderBy: { field: CREATED_AT, direction: ASC }, first: $forker_count) { edges { node { createdAt owner { login } }}}   }}} }}", "variables": { "org_name": orgName, "repo_count": Number(repoCount), "forker_count": Number(forkerCount) } })
     }).then(async (response) => {
       setLoading(false);
       if (!response.ok) {
         // handle errors
-        console.log(response);
         setError("Response was ill-formed. Please try again!");
         return;
       }
 
       const data = await response.json();
-      console.log(data);
       setRepos(data.data.organization.repositories.edges);
     }).catch(error => {
       setError(genericErrorMessage);

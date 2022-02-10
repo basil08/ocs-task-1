@@ -2,10 +2,8 @@ const Table = ({ repos, repoCount, forkerCount }) => {
 
   repos.sort((a, b) => b.node.forkCount - a.node.forkCount)
 
-  console.log(repos);
   return (
     <ul>
-      {/* {repos.map(repo => <li key={repos.indexOf(repo)}>{repo.name}{' '}{repo.node.forkCount}</li>)} */}
       {repos.map(repo => {
         return <li className="py-2">
           <a href="#" class="block p-6 max-w-sm bg-white rounded-lg border border-gray-200 shadow-md hover:bg-gray-100 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700">
