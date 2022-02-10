@@ -48,7 +48,7 @@ export default function Home() {
     // but it's client-side request
     fetch(`${GITHUB_REST_API_ENDPOINT}`, {
       method: 'POST',
-      headers: { "Content-Type": "application/json", "Authorization": "Bearer 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" },
+      headers: { "Content-Type": "application/json", "Authorization": "Bearer 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" },
       body: JSON.stringify({ "query": "query($org_name: String!, $repo_count: Int!, $forker_count: Int!) { organization(login: $org_name) { repositories(first: $repo_count) { edges { node { name forkCount forks(orderBy: { field: CREATED_AT, direction: ASC }, first: $forker_count) { edges { node { createdAt owner { login } }}}   }}} }}", "variables": { "org_name": orgName, "repo_count": Number(repoCount), "forker_count": Number(forkerCount) } })
     }).then(async (response) => {
       setLoading(false);
