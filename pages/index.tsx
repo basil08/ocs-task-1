@@ -9,7 +9,7 @@ import Table from "../components/Table"
 
 export default function Home() {
 
-  const GITHUB_REST_API_ENDPOINT = "https://api.github.com/";
+  const GITHUB_REST_API_ENDPOINT = "https://api.github.com/graphql";
   const genericErrorMessage = "Something went wrong! Please try again!";
 
   const [isLoading, setLoading] = useState(false);
@@ -21,17 +21,6 @@ export default function Home() {
   const [forkerCount, setForkerCount] = useState(5);
 
   const [repos, setRepos] = useState([]);
-  // for each "popular" repo, forks will contain an array of its oldest forkers
-  const [forks, setForks] = useState([]);
-
-  const getRepoData = async (page: Number) => {
-    const data = await fetch(`${GITHUB_REST_API_ENDPOINT}orgs/${orgName}/repos?per_page=100&page=${page}`, {
-      method: 'GET',
-      headers: { "Content-Type": "application/json" }
-    });
-
-    return data.json();
-  }
 
   const handleSubmit = async (e: Event) => {
     e.preventDefault();
@@ -39,63 +28,44 @@ export default function Home() {
 
     if (!orgName) {
       setError("No organization name is set! Please set one to proceed!");
+      setLoading(false);
       return;
     }
 
     if (!repoCount) {
-      // const newArr = warnings.slice().push("No repoCount was set! Default value of 10 is assumed!");
       setWarning("No repoCount was set! Default value of 10 is assumed!");
       setRepoCount(10);
     }
 
     if (!forkerCount) {
-      // const newArr = warnings.slice().push("No forkerCount was set! Default value of 5 is assumed!");
       setWarning("No forkerCount was set! Default value of 5 is assumed!");
       setForkerCount(5);
     }
 
-    if (typeof (repoCount) !== 'number' || typeof (forkerCount) !== 'number') {
-      setError("repoCount and forkerCount must be numbers!");
-      return;
-    }
-
     setError("");
 
-    let tmpArray = [];
-    let i = 1;
-    while (true) { 
-      const arr = await getRepoData(i);
-      if (!arr) {
-        break;
-      }
-      i++;
-      tmpArray.push(...arr);
-    }
-
-    
-    console.log(tmpArray);
     // make endpoint an .env variable?
     // but it's client-side request
-  //   fetch(`${GITHUB_REST_API_ENDPOINT}orgs/${orgName}/repos?per_page=1000`, {
-  //     method: 'GET',
-  //     headers: { "Content-Type": "application/json" }
-  //   }).then(async (response) => {
-  //     setLoading(false);
-  //     if (!response.ok) {
-  //       // handle errors
-  //       setError("Response was ill-formed. Please try again!");
-  //       return;
-  //     }
+    fetch(`${GITHUB_REST_API_ENDPOINT}`, {
+      method: 'POST',
+      headers: { "Content-Type": "application/json", "Authorization": "Bearer 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" },
+      body: JSON.stringify({ "query": "query($org_name: String!, $repo_count: Int!, $forker_count: Int!) { organization(login: $org_name) { repositories(first: $repo_count) { edges { node { name forkCount forks(orderBy: { field: CREATED_AT, direction: ASC }, first: $forker_count) { edges { node { createdAt owner { login } }}}   }}} }}", "variables": { "org_name": orgName, "repo_count": Number(repoCount), "forker_count": Number(forkerCount) } })
+    }).then(async (response) => {
+      setLoading(false);
+      if (!response.ok) {
+        // handle errors
+        console.log(response);
+        setError("Response was ill-formed. Please try again!");
+        return;
+      }
 
-  //     const data = await response.json();
-  //     console.log(data);
-  //     setRepos(data);
-  //   }).catch(error => {
-  //     setError(genericErrorMessage);
-  //   })
-  // };
+      const data = await response.json();
+      console.log(data);
+      setRepos(data.data.organization.repositories.edges);
+    }).catch(error => {
+      setError(genericErrorMessage);
+    })
   };
-
   return (
     <div className="flex min-h-screen flex-col items-center justify-center py-6">
       <Head>
@@ -115,7 +85,6 @@ export default function Home() {
         </p>
 
         {error && <p className="p-1 m-1 text-red bg-red-300">{error}</p>}
-        {/* {warnings && <p className="p-1 m-1 text-orange bg-orange-300">{warnings}</p>} */}
 
         <div className="mt-6 flex max-w-4xl flex-wrap items-center justify-around sm:w-full">
           <form>
