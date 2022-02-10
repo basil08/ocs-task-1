@@ -22,7 +22,7 @@ export default function Home() {
 
   const [repos, setRepos] = useState([]);
 
-  const handleSubmit = async (e: Event) => {
+  const handleSubmit = async (e: any) => {
     e.preventDefault();
     setLoading(true);
 
@@ -112,7 +112,7 @@ export default function Home() {
                   type="text"
                   name="n"
                   id="n"
-                  onChange={(e) => setRepoCount(e.target.value)}
+                  onChange={(e) => setRepoCount(Number(e.target.value))}
                   className="focus:ring-emerald-500 focus:border-emerald-500 block w-full pl-7 pr-12 sm:text-sm border-gray-300 rounded-md"
                   placeholder="10"
                   value={repoCount}
@@ -129,7 +129,7 @@ export default function Home() {
                   type="text"
                   name="m"
                   id="m"
-                  onChange={(e) => setForkerCount(e.target.value)}
+                  onChange={(e) => setForkerCount(Number(e.target.value))}
                   className="focus:ring-emerald-500 focus:border-emerald-500 block w-full pl-7 pr-12 sm:text-sm border-gray-300 rounded-md"
                   placeholder="5"
                   value={forkerCount}
@@ -139,7 +139,7 @@ export default function Home() {
 
             <div className="py-3">
               <button
-                onClick={handleSubmit}
+                onClick={(e) => handleSubmit(e)}
                 className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-emerald-600 hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500"
               >Fetch</button>
             </div>
