@@ -46,10 +46,10 @@ export default function Home() {
 
     // make endpoint an .env variable?
     // but it's client-side request
-    fetch(`${GITHUB_REST_API_ENDPOINT}`, {
+    fetch(`/api/getdata`, {
       method: 'POST',
-      headers: { "Content-Type": "application/json", "Authorization": "Bearer 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" },
-      body: JSON.stringify({ "query": "query($org_name: String!, $repo_count: Int!, $forker_count: Int!) { organization(login: $org_name) { repositories(first: $repo_count) { edges { node { name forkCount forks(orderBy: { field: CREATED_AT, direction: ASC }, first: $forker_count) { edges { node { createdAt owner { login } }}}   }}} }}", "variables": { "org_name": orgName, "repo_count": Number(repoCount), "forker_count": Number(forkerCount) } })
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ orgName, repoCount, forkerCount })
     }).then(async (response) => {
       setLoading(false);
       if (!response.ok) {
@@ -57,9 +57,9 @@ export default function Home() {
         setError("Response was ill-formed. Please try again!");
         return;
       }
-
       const data = await response.json();
-      setRepos(data.data.organization.repositories.edges);
+      console.log(data);
+      setRepos(data.data.data.organization.repositories.edges);
     }).catch(error => {
       setError(genericErrorMessage);
     })
